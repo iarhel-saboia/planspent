@@ -112,6 +112,21 @@ class GoalTest < ActiveSupport::TestCase
     assert_equal 3, Goal.find(goal.id).streak(current)
   end
 
+  test "a percent goal isn't hit in a month with no income and nothing invested" do
+    goal = goals(:save_monthly)
+    empty_month = Date.current.beginning_of_month << 6
+    result = goal.month_result(empty_month)
+    assert result.empty?
+    assert_not result.hit?
+    assert_equal 0, result.percent
+    assert_equal 0, goal.streak(empty_month)
+
+    goals(:trip).contribute(amount: 100, occurred_on: empty_month)
+    result = Goal.find(goal.id).month_result(empty_month)
+    assert result.hit?
+    assert_not result.empty?
+  end
+
   test "monthly goals don't take contributions" do
     entry = entries(:rent)
     assert_not entry.update(goal: goals(:save_monthly))

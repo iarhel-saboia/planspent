@@ -1,3 +1,14 @@
+# Default categories. They must exist on a fresh database too (db:prepare loads schema.rb and skips the
+# data in the create_categories migration), and before the sample entries so these get categorized.
+[
+  [ "Alimentação", "orange" ], [ "Mercado", "lime" ], [ "Transporte", "sky" ], [ "Moradia", "amber" ],
+  [ "Contas e serviços", "cyan" ], [ "Saúde", "red" ], [ "Educação", "violet" ], [ "Lazer", "pink" ],
+  [ "Compras", "fuchsia" ], [ "Assinaturas", "indigo" ], [ "Viagem", "teal" ], [ "Impostos e taxas", "stone" ],
+  [ "Transferências", "blue" ], [ "Salário", "emerald" ], [ "Investimentos", "green" ], [ "Outros", "gray" ]
+].each do |name, color|
+  Category.find_or_create_by!(name: name) { |category| category.color = color }
+end
+
 # Dados de exemplo: bin/rails db:seed
 month = Date.current.beginning_of_month
 

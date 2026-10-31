@@ -8,10 +8,15 @@ Everything runs locally and for free: no paid APIs, no external AI and no bank d
 
 The interface is in Brazilian Portuguese, and the statement parser targets Brazilian bank formats.
 
-<!-- Screenshots: save the images in docs/ and uncomment
-![Home](docs/home.png)
-![Statement import](docs/importar.png)
--->
+![Monthly entries, automatically categorized](docs/home.png)
+
+| Monthly summary | Goals |
+|---|---|
+| ![Monthly summary charts](docs/resumo.png) | ![Savings and monthly goals](docs/metas.png) |
+| **Statement import** | **Dark mode** |
+| ![Statement import](docs/importar.png) | ![Dark mode](docs/home-dark.png) |
+
+<sub>Screenshots use fictional sample data.</sub>
 
 ## Features
 
@@ -55,10 +60,10 @@ sudo apt install tesseract-ocr tesseract-ocr-por poppler-utils
 ```bash
 git clone git@github.com:iarhel-saboia/planspent.git
 cd planspent
-bin/setup        # installs gems, prepares the database and starts the server
+bin/setup        # installs gems, creates the database with the default categories and a few sample entries, and starts the server
 ```
 
-To fill the database with sample data, run `bin/rails db:seed`. Later, to start the server with Tailwind rebuilding automatically, use:
+Later, to start the server with Tailwind rebuilding automatically, use:
 
 ```bash
 bin/dev

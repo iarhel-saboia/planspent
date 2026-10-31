@@ -44,13 +44,13 @@
   <div class="mt-4 flex items-end justify-between gap-3">
     <ol class="flex items-end gap-1.5" aria-label="Últimos meses">
       <% goal.month_history(month).each do |past| %>
-        <% past_current = past.month == Date.current.beginning_of_month %>
+        <% neutral = past.empty? || past.month >= Date.current.beginning_of_month %>
         <li class="flex flex-col items-center gap-1" title="<%= month_label(past.month) %>: <%= brl(past.invested) %> de <%= brl(past.target) %>">
           <span class="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold
                        <%= if past.hit? then 'bg-emerald-500 text-white'
-                           elsif past_current || past.month > Date.current then 'bg-surface-muted text-fg-subtle'
+                           elsif neutral then 'bg-surface-muted text-fg-subtle'
                            else 'bg-rose-500/15 text-rose-600 dark:text-rose-400' end %>">
-            <%= past.hit? ? "✓" : (past_current || past.month > Date.current ? "·" : "✕") %>
+            <%= past.hit? ? "✓" : (neutral ? "·" : "✕") %>
           </span>
           <span class="text-[10px] uppercase text-fg-subtle"><%= l(past.month, format: "%b") %></span>
         </li>

@@ -31,7 +31,7 @@
             <div class="flex items-center gap-3">
               <span class="text-sm font-semibold tabular-nums <%= result.invested.negative? ? 'text-rose-600 dark:text-rose-400' : 'text-fg' %>"><%= brl(result.invested) %></span>
               <span class="flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold <%= result.hit? ? 'bg-emerald-500 text-white' : 'bg-surface-muted text-fg-subtle' %>"
-                    title="<%= result.hit? ? 'Atingida' : 'Não atingida' %>"><%= result.hit? ? "✓" : "–" %></span>
+                    title="<%= if result.hit? then "Atingida" elsif result.empty? then "Sem movimentação" else "Não atingida" end %>"><%= result.hit? ? "✓" : "–" %></span>
             </div>
           </li>
         <% end %>

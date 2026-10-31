@@ -21,9 +21,13 @@ class Goal < ApplicationRecord
   CONTRIBUTION_CATEGORY = "Investimentos"
 
   MonthResult = Data.define(:month, :invested, :target, :income) do
-    def hit? = invested >= target
-    def percent = target.positive? ? (invested / target * 100).floor.clamp(0, 100) : 100
+    # A share of no income is zero: such a month only counts as hit if something was invested
+    def hit? = target.positive? ? invested >= target : invested.positive?
+    def percent = target.positive? ? (invested / target * 100).floor.clamp(0, 100) : (hit? ? 100 : 0)
     def surplus = invested - target
+
+    # Nothing came in and nothing was invested: shown as neutral instead of hit or missed
+    def empty? = income.zero? && invested.zero?
   end
 
   enum :kind, { savings: 0, monthly: 1 }, validate: true
