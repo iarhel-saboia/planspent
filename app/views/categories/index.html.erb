@@ -1,0 +1,40 @@
+<% content_for :title, "PlanSpent · Categorias" %>
+<% month_total = @totals.values.sum %>
+
+<header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-fg sm:text-3xl">Categorias</h1>
+    <p class="mt-1 text-sm text-fg-muted">Gastos de <%= month_label(@month).downcase %> por categoria. As categorias são detectadas pela descrição e aprendem com as suas correções.</p>
+  </div>
+
+  <% if @uncategorized_count.positive? %>
+    <%= button_to categorize_entries_path,
+          class: "inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 cursor-pointer" do %>
+      <%= nav_icon(:tag, "h-4 w-4") %>
+      Categorizar <%= @uncategorized_count %> sem categoria
+    <% end %>
+  <% end %>
+</header>
+
+<section class="mt-8 overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-line">
+  <ul id="categories" class="divide-y divide-line-subtle">
+    <% @categories.each do |category| %>
+      <% total = @totals.fetch(category.id, 0) %>
+      <% share = month_total.positive? ? (total / month_total * 100).round : 0 %>
+      <li class="px-5 py-4">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex min-w-0 items-center gap-3">
+            <span class="rounded-full px-2.5 py-0.5 text-xs font-medium <%= category.badge_classes %>"><%= category.name %></span>
+            <span class="text-xs text-fg-subtle"><%= pluralize(@counts.fetch(category.id, 0), "lançamento", plural: "lançamentos") %></span>
+          </div>
+          <span class="text-sm font-semibold tabular-nums <%= total.positive? ? 'text-fg' : 'text-fg-subtle' %>"><%= brl(total) %></span>
+        </div>
+        <% if total.positive? %>
+          <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-muted">
+            <div class="h-full rounded-full bg-indigo-500" style="width: <%= share %>%"></div>
+          </div>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</section>

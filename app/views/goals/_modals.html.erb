@@ -1,0 +1,15 @@
+<%# Edit, put aside and take back dialogs for one goal %>
+<%= render layout: "shared/dialog", locals: { id: goal_modal_id(goal), title: "Editar meta", dot: goal.colors[:dot] } do %>
+  <%= render "goals/form", goal: goal %>
+<% end %>
+
+<% if goal.savings? %>
+  <%= render layout: "shared/dialog", locals: { id: contribution_modal_id(goal, false), title: "Guardar em #{goal.name}", dot: goal.colors[:dot] } do %>
+    <%= render "goals/contribution_form", goal: goal, entry: Entry.new, withdrawal: false %>
+  <% end %>
+  <% if goal.saved_amount.positive? %>
+    <%= render layout: "shared/dialog", locals: { id: contribution_modal_id(goal, true), title: "Resgatar de #{goal.name}", dot: goal.colors[:dot] } do %>
+      <%= render "goals/contribution_form", goal: goal, entry: Entry.new, withdrawal: true %>
+    <% end %>
+  <% end %>
+<% end %>

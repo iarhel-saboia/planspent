@@ -1,0 +1,12 @@
+trip:
+  name: Viagem
+  target_amount: 5000.00
+  target_date: <%= Date.current.next_year.end_of_year %>
+  color: sky
+  created_at: <%= 2.months.ago %>
+
+save_monthly:
+  name: Guardar todo mês
+  kind: monthly
+  target_percent: 20
+  color: emerald

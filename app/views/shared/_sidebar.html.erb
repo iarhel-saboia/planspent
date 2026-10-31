@@ -1,0 +1,38 @@
+<aside data-controller="sidebar" data-collapsed="<%= sidebar_state %>"
+       class="group/sidebar sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r border-line bg-surface transition-[width] duration-200 data-[collapsed=true]:w-[4.5rem] data-[collapsed=auto]:max-md:w-[4.5rem]">
+  <div class="flex h-16 items-center gap-3 px-4">
+    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-lg font-bold text-white">P</span>
+    <span class="truncate text-lg font-bold tracking-tight text-fg group-data-[collapsed=true]/sidebar:hidden group-data-[collapsed=auto]/sidebar:max-md:hidden">PlanSpent</span>
+  </div>
+
+  <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="Menu principal">
+    <% navigation_items.each do |item| %>
+      <% active = current_page?(item[:path]) || (item[:path] != root_path && request.path.start_with?("#{item[:path]}/")) %>
+      <%= link_to item[:path], title: item[:label], aria: { label: item[:label], current: (active ? "page" : nil) },
+            class: "flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition
+                    #{active ? 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300' : 'text-fg-soft hover:bg-surface-muted hover:text-fg'}" do %>
+        <%= nav_icon(item[:icon]) %>
+        <span class="truncate group-data-[collapsed=true]/sidebar:hidden group-data-[collapsed=auto]/sidebar:max-md:hidden"><%= item[:label] %></span>
+      <% end %>
+    <% end %>
+  </nav>
+
+  <div class="space-y-1 border-t border-line-subtle p-3">
+    <button type="button" data-controller="theme" data-action="theme#toggle"
+            aria-label="Alternar modo claro/escuro" title="Alternar modo claro/escuro"
+            class="flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium text-fg-muted transition hover:bg-surface-muted hover:text-fg cursor-pointer">
+      <%= nav_icon(:moon, "h-5 w-5 shrink-0 dark:hidden") %>
+      <%= nav_icon(:sun, "hidden h-5 w-5 shrink-0 dark:block") %>
+      <span class="truncate group-data-[collapsed=true]/sidebar:hidden group-data-[collapsed=auto]/sidebar:max-md:hidden">
+        <span class="dark:hidden">Modo escuro</span>
+        <span class="hidden dark:inline">Modo claro</span>
+      </span>
+    </button>
+    <button type="button" data-action="sidebar#toggle"
+            aria-label="Recolher ou expandir menu" title="Recolher ou expandir menu"
+            class="flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium text-fg-muted transition hover:bg-surface-muted hover:text-fg cursor-pointer">
+      <%= nav_icon(:collapse, "h-5 w-5 shrink-0 transition-transform group-data-[collapsed=true]/sidebar:rotate-180 group-data-[collapsed=auto]/sidebar:max-md:rotate-180") %>
+      <span class="truncate group-data-[collapsed=true]/sidebar:hidden group-data-[collapsed=auto]/sidebar:max-md:hidden">Recolher menu</span>
+    </button>
+  </div>
+</aside>

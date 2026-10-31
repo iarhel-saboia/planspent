@@ -1,0 +1,318 @@
+# Palavras-chave usadas para categorizar lançamentos pela descrição.
+#
+# - A comparação ignora maiúsculas, acentos e pontuação: "IFD*BURGER" vira "ifd burger".
+# - Cada palavra-chave precisa aparecer inteira na descrição ("bar" não pega "barbearia").
+# - As categorias são testadas na ordem deste arquivo e a primeira que tiver uma palavra encontrada vence,
+#   por isso as mais específicas vêm antes (Assinaturas antes de Compras, Transferências por último).
+# - Correções feitas na tela têm prioridade sobre estas regras e ficam memorizadas.
+# - O nome da categoria precisa ser igual ao cadastrado. Reinicie o servidor depois de editar.
+
+Salário: # só para entradas
+  - salario
+  - folha de pagamento
+  - proventos
+  - vencimentos
+  - adiantamento salarial
+  - pagto salario
+  - pgto salario
+
+Investimentos:
+  - aplicacao
+  - resgate
+  - cdb
+  - rdb
+  - lci
+  - lca
+  - tesouro direto
+  - poupanca
+  - investimento
+  - corretora
+  - xp investimentos
+  - nuinvest
+  - rendimento
+  - rendimentos
+  - dividendos
+  - jcp
+
+Impostos e taxas:
+  - iof
+  - tarifa
+  - tarifas
+  - anuidade
+  - juros
+  - multa
+  - encargos
+  - ipva
+  - iptu
+  - darf
+  - das simples
+  - imposto
+  - licenciamento
+  - detran
+  - cesta de servicos
+  - pacote de servicos
+
+Assinaturas:
+  - netflix
+  - spotify
+  - disney
+  - disney plus
+  - hbo
+  - hbo max
+  - hbomax
+  - prime video
+  - amazon prime
+  - globoplay
+  - deezer
+  - youtube premium
+  - google one
+  - google storage
+  - apple com bill
+  - icloud
+  - apple music
+  - xbox game pass
+  - paramount
+  - crunchyroll
+  - chatgpt
+  - openai
+  - adobe
+  - dropbox
+  - canva
+
+Alimentação:
+  - ifood
+  - ifd
+  - rappi
+  - 99food
+  - ze delivery
+  - mcdonalds
+  - mc donalds
+  - burger king
+  - subway
+  - habibs
+  - giraffas
+  - outback
+  - starbucks
+  - spoleto
+  - bobs
+  - kfc
+  - pizza
+  - pizzaria
+  - restaurante
+  - lanchonete
+  - lanches
+  - padaria
+  - panificadora
+  - cafeteria
+  - cafe
+  - bar
+  - churrascaria
+  - sushi
+  - acai
+  - sorveteria
+  - doceria
+  - confeitaria
+
+Mercado:
+  - supermercado
+  - supermercados
+  - mercadinho
+  - mercearia
+  - hipermercado
+  - atacadao
+  - assai
+  - carrefour
+  - pao de acucar
+  - extra hiper
+  - sams club
+  - makro
+  - hortifruti
+  - sacolao
+  - acougue
+  - st marche
+  - zaffari
+  - guanabara
+  - savegnago
+
+Transporte:
+  - uber
+  - 99 pop
+  - 99app
+  - 99 taxi
+  - cabify
+  - taxi
+  - posto
+  - combustivel
+  - combustiveis
+  - gasolina
+  - shell
+  - ipiranga
+  - petrobras
+  - estacionamento
+  - estapar
+  - sem parar
+  - conectcar
+  - veloe
+  - pedagio
+  - metro
+  - cptm
+  - bilhete unico
+  - sptrans
+  - riocard
+  - onibus
+
+Moradia:
+  - aluguel
+  - condominio
+  - quintoandar
+  - quinto andar
+  - imobiliaria
+
+Contas e serviços:
+  - enel
+  - eletropaulo
+  - cemig
+  - copel
+  - celesc
+  - light
+  - coelba
+  - celpe
+  - cpfl
+  - energisa
+  - equatorial
+  - sabesp
+  - copasa
+  - cedae
+  - sanepar
+  - embasa
+  - caesb
+  - comgas
+  - naturgy
+  - claro
+  - vivo
+  - tim
+  - net servicos
+  - sky
+  - energia eletrica
+  - conta de luz
+  - agua e esgoto
+  - internet
+  - telefone
+  - recarga celular
+
+Saúde:
+  - drogasil
+  - droga raia
+  - drogaraia
+  - raia
+  - pague menos
+  - panvel
+  - drogaria
+  - farmacia
+  - ultrafarma
+  - hospital
+  - clinica
+  - laboratorio
+  - consultorio
+  - dentista
+  - odonto
+  - unimed
+  - amil
+  - hapvida
+  - sulamerica
+  - notredame
+  - fleury
+  - academia
+  - smart fit
+  - smartfit
+  - bluefit
+  - gympass
+  - wellhub
+  - totalpass
+
+Educação:
+  - escola
+  - colegio
+  - faculdade
+  - universidade
+  - curso
+  - udemy
+  - alura
+  - coursera
+  - livraria
+  - estacio
+  - anhanguera
+  - kumon
+  - wizard
+  - ccaa
+  - fisk
+  - duolingo
+
+Viagem:
+  - latam
+  - gol linhas
+  - voegol
+  - azul linhas
+  - voeazul
+  - airbnb
+  - booking
+  - hotel
+  - pousada
+  - decolar
+  - 123milhas
+  - hurb
+  - cvc
+  - clickbus
+  - buser
+  - rodoviaria
+  - localiza
+  - movida
+  - unidas
+
+Lazer:
+  - cinema
+  - cinemark
+  - ingresso
+  - sympla
+  - eventim
+  - ticketmaster
+  - teatro
+  - show
+  - parque
+  - steam
+  - playstation
+  - psn
+  - xbox
+  - nintendo
+  - epic games
+  - bilheteria
+
+Compras:
+  - mercado livre
+  - mercadolivre
+  - amazon
+  - amzn
+  - shopee
+  - aliexpress
+  - magazine luiza
+  - magalu
+  - americanas
+  - casas bahia
+  - shein
+  - renner
+  - riachuelo
+  - zara
+  - centauro
+  - netshoes
+  - decathlon
+  - kabum
+  - leroy merlin
+  - havan
+  - shopping
+
+Transferências:
+  - pix
+  - ted
+  - doc
+  - transferencia
+  - transf

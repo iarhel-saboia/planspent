@@ -1,0 +1,46 @@
+<% credit = entry.credit? %>
+<% ring = credit ? "focus:ring-emerald-500" : "focus:ring-rose-500" %>
+<% input = "block w-full rounded-xl border-0 py-2.5 px-3.5 text-fg shadow-sm ring-1 ring-line placeholder:text-fg-subtle focus:ring-2 #{ring}" %>
+
+<%= form_with model: entry, id: "#{entry.kind}_form", class: "mt-5 space-y-4" do |f| %>
+  <%= f.hidden_field :kind %>
+
+  <% if entry.errors.any? %>
+    <div class="rounded-xl bg-rose-50 dark:bg-rose-500/15 px-4 py-3 text-sm text-rose-700 dark:text-rose-300 ring-1 ring-rose-200 dark:ring-rose-500/30">
+      <ul class="list-disc space-y-0.5 pl-4">
+        <% entry.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :amount, "Valor", class: "mb-1.5 block text-sm font-medium text-fg-soft" %>
+    <div class="relative">
+      <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-fg-subtle">R$</span>
+      <%= f.text_field :amount, inputmode: "decimal", placeholder: "0,00", autocomplete: "off", autofocus: true,
+            value: entry.amount_before_type_cast,
+            class: "#{input} pl-11 text-lg font-semibold tabular-nums" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :description, "Descrição", class: "mb-1.5 block text-sm font-medium text-fg-soft" %>
+    <%= f.text_field :description, maxlength: 120, autocomplete: "off",
+          placeholder: credit ? "Ex.: Salário, freelance…" : "Ex.: Mercado, aluguel…",
+          class: input %>
+  </div>
+
+  <div>
+    <%= f.label :occurred_on, "Data", class: "mb-1.5 block text-sm font-medium text-fg-soft" %>
+    <%= f.date_field :occurred_on, class: input %>
+  </div>
+
+  <div class="flex justify-end gap-3 pt-2">
+    <button type="button" data-action="modal#close"
+            class="rounded-xl px-4 py-2.5 text-sm font-semibold text-fg-soft hover:bg-surface-muted cursor-pointer">Cancelar</button>
+    <%= f.submit credit ? "Salvar crédito" : "Salvar gasto",
+          class: "rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm cursor-pointer #{credit ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-rose-600 hover:bg-rose-500'}" %>
+  </div>
+<% end %>

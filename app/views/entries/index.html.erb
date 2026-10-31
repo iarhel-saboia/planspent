@@ -1,0 +1,84 @@
+<% content_for :title, "PlanSpent · #{month_label(@month)}" %>
+<%= turbo_stream_from "entries" %>
+
+<header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-fg sm:text-3xl"><%= month_label(@month) %></h1>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3">
+    <button type="button" data-controller="modal-trigger" data-action="modal-trigger#open" data-modal-trigger-dialog-value="month_chart_modal"
+            class="inline-flex items-center gap-2 rounded-xl bg-surface px-4 py-2.5 text-sm font-medium text-fg-soft shadow-sm ring-1 ring-line transition hover:bg-surface-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
+      <%= nav_icon(:chart, "h-4 w-4") %>
+      Ver gráfico
+    </button>
+
+    <%= form_with url: root_path, method: :get, data: { controller: "auto-submit", turbo_action: "advance" } do %>
+      <label for="month" class="sr-only">Mês</label>
+      <div class="relative">
+        <%= select_tag :month,
+              options_for_select(@available_months.map { |m| [month_label(m), m.strftime("%Y-%m")] }, @month.strftime("%Y-%m")),
+              data: { action: "change->auto-submit#submit" },
+              class: "appearance-none rounded-xl border-0 bg-surface py-2.5 pl-4 pr-10 text-sm font-medium text-fg-soft shadow-sm ring-1 ring-line focus:ring-2 focus:ring-indigo-500 cursor-pointer" %>
+        <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+      </div>
+    <% end %>
+  </div>
+</header>
+
+<%# Month totals and the add buttons share one row on large screens (buttons stacked in the last column) %>
+<section id="month_totals" class="mt-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-[repeat(3,minmax(0,1fr))_auto]">
+  <div class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
+    <p class="text-sm font-medium text-fg-muted">Créditos</p>
+    <p class="mt-2 text-2xl font-semibold text-emerald-600 dark:text-emerald-400"><%= brl(@credits) %></p>
+  </div>
+  <div class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
+    <p class="text-sm font-medium text-fg-muted">Gastos</p>
+    <p class="mt-2 text-2xl font-semibold text-rose-600 dark:text-rose-400"><%= brl(@debits) %></p>
+  </div>
+  <div class="rounded-2xl p-5 shadow-sm <%= @balance.negative? ? 'bg-rose-600' : 'bg-indigo-600' %> text-white">
+    <p class="text-sm font-medium text-white/80">Saldo do mês</p>
+    <p class="mt-2 text-2xl font-semibold"><%= brl(@balance) %></p>
+  </div>
+
+  <div class="flex flex-wrap gap-3 sm:col-span-3 lg:col-span-1 lg:flex-col lg:flex-nowrap">
+    <button type="button" data-controller="modal-trigger" data-action="modal-trigger#open" data-modal-trigger-dialog-value="debit_modal"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas cursor-pointer lg:flex-1">
+      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z"/></svg>
+      Adicionar gasto
+    </button>
+    <button type="button" data-controller="modal-trigger" data-action="modal-trigger#open" data-modal-trigger-dialog-value="credit_modal"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas cursor-pointer lg:flex-1">
+      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"/></svg>
+      Adicionar crédito
+    </button>
+  </div>
+</section>
+
+<section class="mt-8 overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-line">
+  <div class="border-b border-line-subtle px-5 py-4">
+    <h2 class="text-base font-semibold text-fg">Lançamentos</h2>
+  </div>
+
+  <% if @entries.any? %>
+    <ul id="entries" class="divide-y divide-line-subtle">
+      <% @entries.each do |entry| %>
+        <%= render "entries/entry", entry: entry %>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="px-5 py-14 text-center">
+      <p class="text-sm font-medium text-fg-soft">Nenhum lançamento neste mês</p>
+      <p class="mt-1 text-sm text-fg-muted">Use os botões acima para adicionar gastos ou créditos.</p>
+    </div>
+  <% end %>
+</section>
+
+<%= render "goals/home", monthly_goals: @monthly_goals, savings_goals: @savings_goals, month: @month %>
+
+<%= render "entries/modal", kind: "debit", month: @month %>
+<%= render "entries/modal", kind: "credit", month: @month %>
+<%= render "entries/goal_link_modal" %>
+<%= render layout: "shared/dialog", locals: { id: "month_chart_modal", title: "Resumo de #{l(@month, format: '%B').downcase}", dot: "bg-indigo-500", width: "max-w-2xl" } do %>
+  <%= render "entries/month_chart", chart: month_chart(@month, @goals) %>
+<% end %>

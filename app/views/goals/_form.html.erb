@@ -1,0 +1,77 @@
+<% input = "block w-full rounded-xl border-0 py-2.5 px-3.5 text-fg shadow-sm ring-1 ring-line placeholder:text-fg-subtle focus:ring-2 focus:ring-indigo-500" %>
+<% toggle = "flex-1 cursor-pointer rounded-xl px-3 py-2 text-center text-sm font-medium text-fg-soft ring-1 ring-line" %>
+
+<%= form_with model: goal, id: goal_form_id(goal), namespace: goal_form_id(goal), class: "mt-5 space-y-4" do |f| %>
+  <%= f.hidden_field :kind %>
+  <%= render "shared/form_errors", record: goal %>
+
+  <div>
+    <%= f.label :name, "Nome", class: "mb-1.5 block text-sm font-medium text-fg-soft" %>
+    <%= f.text_field :name, maxlength: 60, autocomplete: "off", autofocus: true,
+          placeholder: goal.monthly? ? "Ex.: Investir todo mês" : "Ex.: Viagem, reserva de emergência…", class: input %>
+  </div>
+
+  <% if goal.monthly? %>
+    <%# The chosen radio shows its field (CSS only); the model keeps only the chosen value %>
+    <div class="flex flex-wrap gap-2">
+      <p class="w-full text-sm font-medium text-fg-soft">Quanto investir por mês</p>
+      <% amount_id, percent_id = "#{goal_form_id(goal)}_basis_amount", "#{goal_form_id(goal)}_basis_percent" %>
+      <%= f.radio_button :monthly_basis, "amount", id: amount_id, class: "peer/amount sr-only" %>
+      <%= f.radio_button :monthly_basis, "percent", id: percent_id, class: "peer/percent sr-only" %>
+      <label for="<%= amount_id %>" class="<%= toggle %> peer-checked/amount:bg-indigo-600 peer-checked/amount:text-white peer-checked/amount:ring-indigo-600">Valor fixo</label>
+      <label for="<%= percent_id %>" class="<%= toggle %> peer-checked/percent:bg-indigo-600 peer-checked/percent:text-white peer-checked/percent:ring-indigo-600">% do que entra</label>
+      <div class="mt-1 hidden w-full peer-checked/amount:block">
+        <div class="relative">
+          <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-fg-subtle">R$</span>
+          <%= f.text_field :target_amount, inputmode: "decimal", placeholder: "0,00", autocomplete: "off", aria: { label: "Valor por mês" },
+                value: decimal_field_value(goal, :target_amount), class: "#{input} pl-11 text-lg font-semibold tabular-nums" %>
+        </div>
+      </div>
+      <div class="mt-1 hidden w-full peer-checked/percent:block">
+        <div class="relative">
+          <%= f.text_field :target_percent, inputmode: "decimal", placeholder: "20", autocomplete: "off", aria: { label: "Porcentagem do que entra" },
+                value: decimal_field_value(goal, :target_percent)&.sub(/,00\z/, ""), class: "#{input} pr-10 text-lg font-semibold tabular-nums" %>
+          <span class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-fg-subtle">%</span>
+        </div>
+        <p class="mt-1.5 text-xs text-fg-muted">Calculado sobre os créditos de cada mês.</p>
+      </div>
+    </div>
+    <p class="text-xs text-fg-muted">Conta o que você guardar nas metas de valor durante o mês, pelo botão Guardar ou vinculando lançamentos (como uma aplicação). Resgates descontam.</p>
+  <% else %>
+    <div>
+      <%= f.label :target_amount, "Quanto quer juntar", class: "mb-1.5 block text-sm font-medium text-fg-soft" %>
+      <div class="relative">
+        <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-fg-subtle">R$</span>
+        <%= f.text_field :target_amount, inputmode: "decimal", placeholder: "0,00", autocomplete: "off",
+              value: decimal_field_value(goal, :target_amount), class: "#{input} pl-11 text-lg font-semibold tabular-nums" %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :target_date, class: "mb-1.5 block text-sm font-medium text-fg-soft" do %>
+        Prazo <span class="font-normal text-fg-subtle">(opcional)</span>
+      <% end %>
+      <%= f.date_field :target_date, min: Date.current, class: input %>
+    </div>
+  <% end %>
+
+  <fieldset>
+    <legend class="mb-1.5 block text-sm font-medium text-fg-soft">Cor</legend>
+    <div class="flex flex-wrap gap-2">
+      <% Goal::COLORS.each do |name, classes| %>
+        <label class="cursor-pointer">
+          <%= f.radio_button :color, name, class: "peer sr-only" %>
+          <span class="block h-8 w-8 rounded-full <%= classes[:dot] %> ring-offset-2 ring-offset-surface peer-checked:ring-2 peer-checked:ring-fg-soft peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500"
+                title="<%= name %>"></span>
+        </label>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <div class="flex justify-end gap-3 pt-2">
+    <button type="button" data-action="modal#close"
+            class="rounded-xl px-4 py-2.5 text-sm font-semibold text-fg-soft hover:bg-surface-muted cursor-pointer">Cancelar</button>
+    <%= f.submit goal.persisted? ? "Salvar alterações" : "Criar meta",
+          class: "rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer" %>
+  </div>
+<% end %>

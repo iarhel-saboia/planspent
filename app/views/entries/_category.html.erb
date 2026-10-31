@@ -1,0 +1,8 @@
+<%= form_with model: entry, data: { controller: "auto-submit" }, class: "inline-flex" do |f| %>
+  <%= f.select :category_id, category_options, { include_blank: entry.category ? false : "Sem categoria" },
+        data: { action: "change->auto-submit#submit" },
+        title: entry.categorization_automatic? ? "Categoria detectada automaticamente. Clique para alterar." : "Clique para alterar a categoria",
+        aria: { label: "Categoria de #{entry.description}" },
+        class: "appearance-none rounded-full border-0 py-0.5 pl-2 pr-2 text-xs font-medium cursor-pointer focus:ring-2 focus:ring-indigo-500
+                #{entry.category ? entry.category.badge_classes : 'bg-surface-muted text-fg-muted'}" %>
+<% end %>

@@ -1,0 +1,36 @@
+pt-BR:
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%d %b"
+    day_names: [Domingo, Segunda-feira, Terça-feira, Quarta-feira, Quinta-feira, Sexta-feira, Sábado]
+    abbr_day_names: [Dom, Seg, Ter, Qua, Qui, Sex, Sáb]
+    month_names: [~, janeiro, fevereiro, março, abril, maio, junho, julho, agosto, setembro, outubro, novembro, dezembro]
+    abbr_month_names: [~, jan, fev, mar, abr, mai, jun, jul, ago, set, out, nov, dez]
+    order: [day, month, year]
+  activerecord:
+    models:
+      entry: Lançamento
+      goal: Meta
+    attributes:
+      entry:
+        description: Descrição
+        amount: Valor
+        kind: Tipo
+        occurred_on: Data
+        goal: Meta
+      goal:
+        name: Nome
+        target_amount: Valor da meta
+        target_date: Prazo
+        target_percent: Porcentagem
+        color: Cor
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      blank: "não pode ficar em branco"
+      greater_than: "deve ser maior que %{count}"
+      less_than_or_equal_to: "deve ser menor ou igual a %{count}"
+      not_a_number: "não é um número"
+      too_long: "é muito longo (máximo: %{count} caracteres)"
+      inclusion: "não está incluído na lista"

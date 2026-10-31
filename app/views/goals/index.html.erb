@@ -1,0 +1,63 @@
+<% content_for :title, "PlanSpent · Metas" %>
+
+<header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight text-fg sm:text-3xl">Metas</h1>
+    <p class="mt-1 text-sm text-fg-muted">Defina quanto quer juntar ou investir por mês e acompanhe o progresso.</p>
+  </div>
+  <div class="flex flex-wrap gap-3">
+    <button type="button" data-controller="modal-trigger" data-action="modal-trigger#open" data-modal-trigger-dialog-value="new_monthly_goal_modal"
+            class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-fg-soft ring-1 ring-line transition hover:bg-surface-muted cursor-pointer">
+      <%= nav_icon(:wallet, "h-5 w-5") %>
+      Meta mensal
+    </button>
+    <button type="button" data-controller="modal-trigger" data-action="modal-trigger#open" data-modal-trigger-dialog-value="new_savings_goal_modal"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 cursor-pointer">
+      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"/></svg>
+      Nova meta
+    </button>
+  </div>
+</header>
+
+<% if @active_goals.empty? && @completed_goals.empty? %>
+  <section class="mt-8 flex flex-col items-center rounded-2xl bg-surface px-5 py-16 text-center shadow-sm ring-1 ring-line">
+    <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
+      <%= nav_icon(:flag, "h-7 w-7") %>
+    </span>
+    <p class="mt-4 text-base font-semibold text-fg">Nenhuma meta ainda</p>
+    <p class="mt-1 max-w-sm text-sm text-fg-muted">Crie uma meta de valor, como uma viagem ou uma reserva de emergência, ou uma meta mensal, como investir 20% do que entra.</p>
+  </section>
+<% else %>
+  <section class="mt-8 grid gap-4 sm:grid-cols-2">
+    <div class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
+      <p class="text-sm font-medium text-fg-muted">Total guardado em metas</p>
+      <p class="mt-2 text-2xl font-semibold text-indigo-600 dark:text-indigo-400"><%= brl(@total_saved) %></p>
+    </div>
+    <div class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
+      <p class="text-sm font-medium text-fg-muted">Metas em andamento</p>
+      <p class="mt-2 text-2xl font-semibold text-fg"><%= @active_goals.size %>
+        <% if @completed_goals.any? %><span class="text-sm font-normal text-fg-muted">· <%= pluralize(@completed_goals.size, "concluída", plural: "concluídas") %></span><% end %>
+      </p>
+    </div>
+  </section>
+
+  <% if @active_goals.any? %>
+    <section id="goals" class="mt-6 grid gap-4 lg:grid-cols-2">
+      <%= render @active_goals %>
+    </section>
+  <% end %>
+
+  <% if @completed_goals.any? %>
+    <h2 class="mt-10 text-base font-semibold text-fg">Concluídas</h2>
+    <section id="completed_goals" class="mt-4 grid gap-4 lg:grid-cols-2">
+      <%= render @completed_goals %>
+    </section>
+  <% end %>
+<% end %>
+
+<%= render layout: "shared/dialog", locals: { id: "new_savings_goal_modal", title: "Nova meta", dot: "bg-indigo-500" } do %>
+  <%= render "goals/form", goal: Goal.new(kind: :savings) %>
+<% end %>
+<%= render layout: "shared/dialog", locals: { id: "new_monthly_goal_modal", title: "Meta mensal de investimento", dot: "bg-indigo-500" } do %>
+  <%= render "goals/form", goal: Goal.new(kind: :monthly) %>
+<% end %>

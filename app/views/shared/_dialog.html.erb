@@ -1,0 +1,17 @@
+<%# Modal opened by a modal-trigger button pointing to its id %>
+<% width ||= "max-w-md" %>
+<dialog id="<%= id %>" data-controller="modal" data-action="click->modal#backdropClose"
+        class="m-auto w-[calc(100%-2rem)] <%= width %> rounded-2xl bg-surface p-0 text-left shadow-2xl">
+  <div class="p-6">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-3">
+        <span class="h-3 w-3 rounded-full <%= dot %>"></span>
+        <h2 class="text-lg font-semibold text-fg"><%= title %></h2>
+      </div>
+      <button type="button" data-action="modal#close" class="rounded-lg p-1 text-fg-subtle hover:bg-surface-muted hover:text-fg-soft cursor-pointer" aria-label="Fechar">
+        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+      </button>
+    </div>
+    <%= yield %>
+  </div>
+</dialog>

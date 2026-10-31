@@ -1,0 +1,45 @@
+<li id="<%= dom_id(entry) %>" class="group flex items-center gap-4 px-5 py-4">
+  <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
+               <%= entry.credit? ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/15 text-rose-600 dark:text-rose-400' %>">
+    <% if entry.credit? %>
+      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 17a.75.75 0 01-.75-.75V5.612L5.29 9.77a.75.75 0 01-1.08-1.04l5.25-5.5a.75.75 0 011.08 0l5.25 5.5a.75.75 0 11-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0110 17z" clip-rule="evenodd"/></svg>
+    <% else %>
+      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a.75.75 0 01.75.75v10.638l3.96-4.158a.75.75 0 111.08 1.04l-5.25 5.5a.75.75 0 01-1.08 0l-5.25-5.5a.75.75 0 111.08-1.04l3.96 4.158V3.75A.75.75 0 0110 3z" clip-rule="evenodd"/></svg>
+    <% end %>
+  </span>
+
+  <div class="min-w-0 flex-1">
+    <p class="truncate text-sm font-medium text-fg"><%= entry.description %></p>
+    <div class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+      <span class="text-xs text-fg-muted"><%= l(entry.occurred_on) %></span>
+      <%= render "entries/category", entry: entry %>
+      <% if entry.goal %>
+        <%= link_to goal_path(entry.goal), title: "Vinculado à meta #{entry.goal.name}",
+              class: "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium hover:underline #{entry.goal.colors[:soft]}" do %>
+          <%= nav_icon(:flag, "h-3 w-3") %><%= entry.goal.name %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <p class="text-sm font-semibold tabular-nums <%= entry.credit? ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' %>">
+    <%= entry.credit? ? "+" : "−" %> <%= brl(entry.amount) %>
+  </p>
+
+  <% if savings_goal_options.any? %>
+    <button type="button" data-controller="goal-link" data-action="goal-link#open"
+            data-goal-link-url-value="<%= entry_path(entry) %>" data-goal-link-goal-value="<%= entry.goal_id %>"
+            data-goal-link-description-value="<%= entry.description %>"
+            title="<%= entry.goal ? "Alterar meta vinculada" : "Vincular a uma meta" %>" aria-label="Vincular <%= entry.description %> a uma meta"
+            class="rounded-lg p-1.5 text-fg-subtle opacity-100 transition hover:bg-surface-muted hover:text-indigo-600 dark:hover:text-indigo-400 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 cursor-pointer">
+      <%= nav_icon(:flag, "h-4 w-4") %>
+    </button>
+  <% end %>
+
+  <%= button_to entry_path(entry), method: :delete,
+        form: { data: { turbo_confirm: "Remover \"#{entry.description}\"?" } },
+        class: "rounded-lg p-1.5 text-fg-subtle opacity-100 transition hover:bg-surface-muted hover:text-rose-600 dark:hover:text-rose-400 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer",
+        title: "Remover" do %>
+    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd"/></svg>
+  <% end %>
+</li>

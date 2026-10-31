@@ -1,0 +1,101 @@
+<%# Month chart: income, expenses and balance; then money invested in goals filling a bar up to the
+    dashed monthly target, and where it went. Shown in a dialog, so the bars grow again each time it opens. %>
+<% month_name = l(chart.summary.month, format: "%B").downcase %>
+<% invested = chart.invested %>
+
+<div id="month_chart" class="mt-4 space-y-8">
+  <%# Income, expenses and balance (same totals as the home page cards) %>
+  <section aria-labelledby="month_chart_overview">
+    <h3 id="month_chart_overview" class="text-sm font-medium text-fg-muted">Entradas, saídas e saldo</h3>
+    <% balance = chart.summary.balance %>
+    <dl class="mt-3 space-y-3">
+      <% [ [ "Entradas", chart.summary.credits, "bg-emerald-600" ],
+           [ "Saídas", chart.summary.debits, "bg-rose-500" ],
+           [ "Saldo", balance, balance.negative? ? "bg-rose-500" : "bg-indigo-600 dark:bg-indigo-500" ] ].each_with_index do |(label, value, color), i| %>
+        <div class="grid grid-cols-[4.5rem_1fr_auto] items-center gap-3">
+          <dt class="text-sm text-fg-soft"><%= label %></dt>
+          <div class="h-3 overflow-hidden rounded-full bg-surface-muted">
+            <div class="chart-grow-x h-full rounded-full <%= color %>"
+                 style="width: <%= chart.overview_position(value) %>%; animation-delay: <%= i * 150 %>ms"></div>
+          </div>
+          <dd class="text-right text-sm font-semibold tabular-nums <%= label == "Saldo" && value.negative? ? 'text-rose-600 dark:text-rose-400' : 'text-fg' %>"><%= brl(value) %></dd>
+        </div>
+      <% end %>
+    </dl>
+    <p class="mt-3 text-xs text-fg-muted">
+      Saldo = <%= brl(chart.summary.credits) %> − <%= brl(chart.summary.debits) %>.
+      <% if chart.invested.positive? %>As saídas incluem <%= brl(chart.invested) %> guardados em metas.<% end %>
+    </p>
+  </section>
+
+  <%# Invested vs target %>
+  <section aria-labelledby="month_chart_invested" class="border-t border-line-subtle pt-6">
+    <p id="month_chart_invested" class="text-sm font-medium text-fg-muted">Investido em <%= month_name %></p>
+    <p class="mt-1 text-sm text-fg-muted">
+      <strong class="text-2xl font-semibold tabular-nums <%= invested.negative? ? 'text-rose-600 dark:text-rose-400' : 'text-fg' %>"><%= brl(invested) %></strong>
+      <% if chart.target %>
+        de <%= brl(chart.target) %> ·
+        <%= chart.hit? ? "meta batida ✓" : "#{chart.target_percent}% da meta" %>
+      <% end %>
+    </p>
+
+    <% if chart.target %>
+      <% goal_x = chart.progress_position(chart.target) %>
+      <div class="relative mt-4 pb-9">
+        <div class="relative h-4 overflow-hidden rounded-full bg-surface-muted" role="progressbar"
+             aria-valuenow="<%= chart.target_percent %>" aria-valuemin="0" aria-valuemax="100"
+             aria-label="Investido em <%= month_name %>: <%= brl(invested) %> de <%= brl(chart.target) %>">
+          <div class="chart-grow-x h-full rounded-full bg-indigo-600 dark:bg-indigo-500" style="width: <%= chart.progress_position(invested) %>%"></div>
+        </div>
+        <%# Dashed goal line, a bit taller than the bar, labeled below %>
+        <div class="absolute -top-1.5 h-7 border-l-2 border-dashed border-fg-soft" style="left: <%= goal_x %>%"></div>
+        <p class="absolute top-6 -translate-x-1/2 whitespace-nowrap text-center text-xs leading-tight text-fg-soft" style="left: <%= goal_x %>%">
+          Meta<br><strong class="font-semibold tabular-nums"><%= brl(chart.target) %></strong>
+        </p>
+        <% if goal_x > 20 %><span class="absolute left-0 top-6 text-xs text-fg-subtle">R$ 0</span><% end %>
+      </div>
+      <p class="text-xs text-fg-muted">
+        <%= chart.target_label %>.
+        <% if chart.hit? %>
+          <%= invested > chart.target ? "Você passou da meta em #{brl(invested - chart.target)}." : "Você chegou exatamente na meta." %>
+        <% else %>
+          Faltam <%= brl(chart.target - invested) %> para chegar lá.
+        <% end %>
+      </p>
+    <% else %>
+      <p class="mt-3 text-sm text-fg-muted">
+        <%= link_to "Crie uma meta mensal", goals_path, class: "font-medium text-indigo-600 dark:text-indigo-400 hover:underline" %>
+        para ver aqui quanto falta para chegar nela.
+      </p>
+    <% end %>
+  </section>
+
+  <%# Where the money went %>
+  <section aria-labelledby="month_chart_breakdown" class="border-t border-line-subtle pt-6">
+    <h3 id="month_chart_breakdown" class="text-sm font-medium text-fg-muted">Onde você investiu</h3>
+    <% if chart.investments.any? %>
+      <dl class="mt-3 space-y-3">
+        <% chart.investments.each_with_index do |(goal, amount), i| %>
+          <div class="grid grid-cols-[minmax(0,8rem)_1fr_auto] items-center gap-3">
+            <dt class="flex min-w-0 items-center gap-2 text-sm text-fg-soft">
+              <span class="h-2.5 w-2.5 shrink-0 rounded-full <%= goal.colors[:dot] %>"></span>
+              <%= link_to goal.name, goal_path(goal), class: "truncate hover:underline" %>
+            </dt>
+            <div class="h-2.5 overflow-hidden rounded-full bg-surface-muted">
+              <div class="chart-grow-x h-full rounded-full <%= amount.negative? ? 'bg-rose-500' : goal.colors[:bar] %>"
+                   style="width: <%= chart.investment_position(amount) %>%; animation-delay: <%= 150 + i * 150 %>ms"></div>
+            </div>
+            <dd class="text-right text-sm font-semibold tabular-nums text-fg">
+              <%= amount.negative? ? "Resgate de #{brl(-amount)}" : brl(amount) %>
+            </dd>
+          </div>
+        <% end %>
+      </dl>
+    <% else %>
+      <p class="mt-2 text-sm text-fg-muted">Nenhum valor guardado em metas neste mês.</p>
+    <% end %>
+    <p class="mt-4 text-xs text-fg-subtle">
+      Conta o que você guardou nas metas de valor no mês, pelo botão Guardar ou vinculando um lançamento (como uma aplicação). Resgates descontam.
+    </p>
+  </section>
+</div>

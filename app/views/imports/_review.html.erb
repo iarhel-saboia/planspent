@@ -1,0 +1,88 @@
+<% selected ||= [] %>
+<% field = "block w-full rounded-lg border-0 bg-surface px-2.5 py-1.5 text-sm text-fg ring-1 ring-line focus:ring-2 focus:ring-indigo-500" %>
+<% credits = entries.select(&:credit?).sum { |e| e.amount.to_d } %>
+<% debits = entries.select(&:debit?).sum { |e| e.amount.to_d } %>
+
+<section class="grid gap-4 sm:grid-cols-3">
+  <div class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
+    <p class="text-sm font-medium text-fg-muted">Transações encontradas</p>
+    <p class="mt-2 text-2xl font-semibold text-fg"><%= entries.size %></p>
+  </div>
+  <div class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
+    <p class="text-sm font-medium text-fg-muted">Entradas</p>
+    <p class="mt-2 text-2xl font-semibold text-emerald-600 dark:text-emerald-400"><%= brl(credits) %></p>
+  </div>
+  <div class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
+    <p class="text-sm font-medium text-fg-muted">Saídas</p>
+    <p class="mt-2 text-2xl font-semibold text-rose-600 dark:text-rose-400"><%= brl(debits) %></p>
+  </div>
+</section>
+
+<%= form_with url: confirm_import_path, data: { controller: "select-all" }, class: "mt-6" do %>
+  <section class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-line">
+    <div class="flex flex-col gap-2 border-b border-line-subtle px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 class="text-base font-semibold text-fg">Confira antes de importar</h2>
+        <p class="text-xs text-fg-muted">
+          Ajuste o que for preciso e desmarque o que não deve entrar.
+          <% if savings_goal_options.any? %>Aplicações e transferências para a poupança podem ser vinculadas a uma meta.<% end %>
+        </p>
+      </div>
+      <label class="inline-flex items-center gap-2 text-sm font-medium text-fg-soft cursor-pointer">
+        <input type="checkbox" data-select-all-target="toggle" data-action="select-all#toggle" class="h-4 w-4 rounded accent-indigo-600">
+        Selecionar todos
+      </label>
+    </div>
+
+    <% if error %>
+      <div class="border-b border-line-subtle bg-rose-50 dark:bg-rose-500/15 px-5 py-3 text-sm text-rose-700 dark:text-rose-300"><%= error %></div>
+    <% end %>
+
+    <ul class="divide-y divide-line-subtle">
+      <% entries.each_with_index do |entry, i| %>
+        <% invalid = entry.errors.any? %>
+        <li id="import_row_<%= i %>" class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 px-5 py-4 sm:grid-cols-[auto_8.5rem_1fr_8rem_7.5rem] sm:items-center <%= 'bg-rose-50/60 dark:bg-rose-500/10' if invalid %>">
+          <%= hidden_field_tag "entries[#{i}][selected]", "0", id: nil %>
+          <%= check_box_tag "entries[#{i}][selected]", "1", selected.include?(i), id: "entries_#{i}_selected",
+                class: "h-4 w-4 rounded accent-indigo-600 sm:row-auto row-span-4", data: { select_all_target: "item", action: "select-all#sync" },
+                aria: { label: "Importar #{entry.description}" } %>
+          <%= date_field_tag "entries[#{i}][occurred_on]", entry.occurred_on, class: field, aria: { label: "Data" } %>
+          <div class="min-w-0">
+            <%= text_field_tag "entries[#{i}][description]", entry.description, maxlength: 120, class: field, aria: { label: "Descrição" } %>
+            <% if savings_goal_options.any? %>
+              <div class="mt-1.5 flex items-center gap-1.5">
+                <%= nav_icon(:flag, "h-3.5 w-3.5 shrink-0 text-fg-subtle") %>
+                <%= select_tag "entries[#{i}][goal_id]", options_for_select(savings_goal_options, entry.goal_id),
+                      include_blank: "Sem meta", aria: { label: "Meta de #{entry.description}" },
+                      class: "max-w-full cursor-pointer rounded-lg border-0 bg-transparent py-0.5 pl-1 pr-7 text-xs font-medium ring-1 ring-line-subtle focus:ring-2 focus:ring-indigo-500 #{entry.goal_id ? 'text-indigo-600 dark:text-indigo-400' : 'text-fg-muted'}" %>
+              </div>
+            <% end %>
+            <% if duplicates.include?(i) %>
+              <p class="mt-1 text-xs font-medium text-amber-600 dark:text-amber-400">Possível duplicado: já existe um lançamento igual nesta data.</p>
+            <% end %>
+            <% if invalid %>
+              <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400"><%= entry.errors.full_messages.to_sentence %></p>
+            <% end %>
+          </div>
+          <div class="relative">
+            <span class="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-fg-subtle">R$</span>
+            <%= text_field_tag "entries[#{i}][amount]", number_with_precision(entry.amount, precision: 2, separator: ",", delimiter: ""),
+                  inputmode: "decimal", class: "#{field} pl-8 text-right tabular-nums", aria: { label: "Valor" } %>
+          </div>
+          <%= select_tag "entries[#{i}][kind]", options_for_select([ [ "Saída", "debit" ], [ "Entrada", "credit" ] ], entry.kind),
+                class: "#{field} cursor-pointer font-medium #{entry.credit? ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}",
+                aria: { label: "Tipo" } %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+
+  <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+    <%= link_to "Enviar outro arquivo", new_import_path,
+          class: "rounded-xl px-4 py-2.5 text-center text-sm font-semibold text-fg-soft hover:bg-surface-muted" %>
+    <button type="submit" data-turbo-submits-with="Importando…"
+            class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 disabled:opacity-70 cursor-pointer">
+      Importar selecionados
+    </button>
+  </div>
+<% end %>

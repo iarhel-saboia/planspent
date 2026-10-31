@@ -1,0 +1,4 @@
+uber:
+  pattern: uber trip
+  category: transport
+  source: automatic

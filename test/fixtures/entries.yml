@@ -1,0 +1,22 @@
+salary:
+  description: Salário
+  amount: 5000.00
+  kind: credit
+  occurred_on: <%= Date.current.beginning_of_month %>
+  category: salary
+  categorization: automatic
+
+rent:
+  description: Aluguel
+  amount: 1500.00
+  kind: debit
+  occurred_on: <%= Date.current.beginning_of_month %>
+  category: housing
+  categorization: manual
+
+old_groceries:
+  description: Mercado antigo
+  amount: 300.00
+  kind: debit
+  occurred_on: <%= Date.current.beginning_of_month << 2 %>
+  categorization: uncategorized

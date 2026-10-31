@@ -1,0 +1,55 @@
+<%# Goals block on the home page: monthly savings for the selected month and up to 3 savings goals %>
+<section class="mt-8 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
+  <div class="flex items-center justify-between gap-3">
+    <h2 class="text-base font-semibold text-fg">Metas</h2>
+    <%= link_to (monthly_goals.any? || savings_goals.any? ? "Ver todas" : "Criar meta"), goals_path,
+          class: "text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline" %>
+  </div>
+
+  <% if monthly_goals.empty? && savings_goals.empty? %>
+    <p class="mt-2 text-sm text-fg-muted">Defina uma meta, como uma viagem ou guardar 20% do que entra, e acompanhe o progresso aqui.</p>
+  <% else %>
+    <ul id="home_goals" class="mt-4 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+      <% monthly_goals.each do |goal| %>
+        <% result = goal.month_result(month) %>
+        <li>
+          <div class="flex items-baseline justify-between gap-2 text-sm">
+            <%= link_to goal.name, goal_path(goal), class: "truncate font-medium text-fg hover:underline" %>
+            <span class="shrink-0 tabular-nums text-fg-muted">
+              <span class="font-semibold <%= result.invested.negative? ? 'text-rose-600 dark:text-rose-400' : 'text-fg' %>"><%= brl(result.invested) %></span>
+              de <%= brl(result.target) %>
+            </span>
+          </div>
+          <div class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-muted" role="progressbar" aria-valuenow="<%= result.percent %>"
+               aria-valuemin="0" aria-valuemax="100" aria-label="Investido no mês em <%= goal.name %>">
+            <div class="h-full rounded-full <%= goal.colors[:bar] %>" style="width: <%= result.percent %>%"></div>
+          </div>
+          <p class="mt-1 text-xs text-fg-muted">
+            Investido em <%= l(month, format: "%B").downcase %> ·
+            <%= result.hit? ? "meta do mês batida ✓" : "#{result.percent}%" %>
+          </p>
+        </li>
+      <% end %>
+
+      <% savings_goals.each do |goal| %>
+        <li>
+          <div class="flex items-baseline justify-between gap-2 text-sm">
+            <%= link_to goal.name, goal_path(goal), class: "truncate font-medium text-fg hover:underline" %>
+            <span class="shrink-0 tabular-nums text-fg-muted">
+              <span class="font-semibold text-fg"><%= brl(goal.saved_amount) %></span> de <%= brl(goal.target_amount) %>
+            </span>
+          </div>
+          <div class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-muted" role="progressbar" aria-valuenow="<%= goal.progress_percent %>"
+               aria-valuemin="0" aria-valuemax="100" aria-label="Progresso de <%= goal.name %>">
+            <div class="h-full rounded-full <%= goal.colors[:bar] %>" style="width: <%= goal.progress_percent %>%"></div>
+          </div>
+          <p class="mt-1 text-xs text-fg-muted">
+            <%= goal.progress_percent %>%
+            <% if (monthly = goal.monthly_needed) %>· guarde <%= brl(monthly) %>/mês<% end %>
+            · <%= GoalsHelper::STATUSES.fetch(goal.status).first.downcase %>
+          </p>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

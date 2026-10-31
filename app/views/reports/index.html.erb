@@ -1,0 +1,47 @@
+<% content_for :title, "PlanSpent · Relatórios Passados" %>
+<% select_class = "w-full appearance-none rounded-xl border-0 bg-surface py-2.5 pl-3.5 pr-8 text-sm font-medium text-fg-soft shadow-sm ring-1 ring-line focus:ring-2 focus:ring-indigo-500 cursor-pointer" %>
+
+<header>
+  <h1 class="text-2xl font-bold tracking-tight text-fg sm:text-3xl">Relatórios Passados</h1>
+  <p class="mt-1 text-sm text-fg-muted">Pesquise qualquer mês para ver o relatório completo.</p>
+</header>
+
+<section class="mt-8 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
+  <%= form_with url: root_path, method: :get, class: "flex flex-col gap-3 sm:flex-row sm:items-end" do %>
+    <div class="flex-1">
+      <label for="month_number" class="mb-1.5 block text-sm font-medium text-fg-soft">Mês</label>
+      <%= select_tag :month_number, report_month_options, class: select_class %>
+    </div>
+    <div class="sm:w-36">
+      <label for="year" class="mb-1.5 block text-sm font-medium text-fg-soft">Ano</label>
+      <%= select_tag :year, report_year_options, class: select_class %>
+    </div>
+    <button type="submit"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas cursor-pointer">
+      <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/></svg>
+      Ver relatório
+    </button>
+  <% end %>
+</section>
+
+<section class="mt-6 overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-line">
+  <div class="border-b border-line-subtle px-5 py-4">
+    <h2 class="text-base font-semibold text-fg">Meses com lançamentos</h2>
+  </div>
+
+  <% if @reports.any? %>
+    <ul id="reports" class="divide-y divide-line-subtle">
+      <% @reports.each do |report| %>
+        <li>
+          <%= link_to root_path(month: report[:month].strftime("%Y-%m")),
+                class: "flex items-center justify-between px-5 py-4 text-sm transition hover:bg-surface-muted" do %>
+            <span class="font-medium text-fg-soft"><%= month_label(report[:month]) %></span>
+            <span class="tabular-nums font-semibold <%= report[:balance].negative? ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400' %>"><%= brl(report[:balance]) %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="px-5 py-14 text-center text-sm text-fg-muted">Nenhum mês anterior com lançamentos.</p>
+  <% end %>
+</section>

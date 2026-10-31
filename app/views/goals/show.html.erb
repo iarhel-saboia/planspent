@@ -1,0 +1,57 @@
+<% content_for :title, "PlanSpent · #{@goal.name}" %>
+
+<%= link_to goals_path, class: "inline-flex items-center gap-1 text-sm font-medium text-fg-muted hover:text-fg-soft" do %>
+  <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd"/></svg>
+  Metas
+<% end %>
+
+<div class="mt-4 grid gap-6 lg:grid-cols-[minmax(0,22rem)_1fr]">
+  <div class="space-y-4">
+    <%= render @goal %>
+    <%= button_to goal_path(@goal), method: :delete,
+          form: { data: { turbo_confirm: "Remover a meta \"#{@goal.name}\"? Os lançamentos dela continuam no extrato." } },
+          class: "w-full rounded-xl px-4 py-2.5 text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/15 cursor-pointer" do %>
+      Remover meta
+    <% end %>
+  </div>
+
+  <% if @goal.monthly? %>
+    <section class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-line">
+      <div class="border-b border-line-subtle px-5 py-4">
+        <h2 class="text-base font-semibold text-fg">Últimos 12 meses</h2>
+        <p class="text-xs text-fg-muted">Investido = valores guardados nas metas de valor no mês, menos resgates.</p>
+      </div>
+      <ul id="months" class="divide-y divide-line-subtle">
+        <% @goal.month_history(Date.current, size: 12).reverse_each do |result| %>
+          <li class="flex items-center justify-between gap-4 px-5 py-3">
+            <div>
+              <p class="text-sm font-medium text-fg"><%= link_to month_label(result.month), root_path(month: result.month.strftime("%Y-%m")), class: "hover:underline" %></p>
+              <p class="text-xs text-fg-muted">Meta: <%= brl(result.target) %><%= " · entrou #{brl(result.income)}" if @goal.target_percent %></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-sm font-semibold tabular-nums <%= result.invested.negative? ? 'text-rose-600 dark:text-rose-400' : 'text-fg' %>"><%= brl(result.invested) %></span>
+              <span class="flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold <%= result.hit? ? 'bg-emerald-500 text-white' : 'bg-surface-muted text-fg-subtle' %>"
+                    title="<%= result.hit? ? 'Atingida' : 'Não atingida' %>"><%= result.hit? ? "✓" : "–" %></span>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% else %>
+    <section class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-line">
+      <div class="border-b border-line-subtle px-5 py-4">
+        <h2 class="text-base font-semibold text-fg">Histórico</h2>
+        <p class="text-xs text-fg-muted">Aportes aparecem como gastos e resgates como créditos.</p>
+      </div>
+      <% if @entries.any? %>
+        <ul id="entries" class="divide-y divide-line-subtle">
+          <%= render partial: "entries/entry", collection: @entries, as: :entry %>
+        </ul>
+      <% else %>
+        <p class="px-5 py-14 text-center text-sm text-fg-muted">Nenhum valor guardado ainda. Use o botão <strong class="text-fg-soft">Guardar</strong>.</p>
+      <% end %>
+    </section>
+  <% end %>
+</div>
+
+<%= render "entries/goal_link_modal" %>

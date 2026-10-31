@@ -1,0 +1,19 @@
+food:
+  name: Alimentação
+  color: orange
+
+transport:
+  name: Transporte
+  color: sky
+
+housing:
+  name: Moradia
+  color: amber
+
+salary:
+  name: Salário
+  color: emerald
+
+other:
+  name: Outros
+  color: gray

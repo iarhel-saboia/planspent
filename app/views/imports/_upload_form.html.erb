@@ -1,0 +1,45 @@
+<section class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line sm:p-6">
+  <% if error %>
+    <div class="mb-5 rounded-xl bg-rose-50 dark:bg-rose-500/15 px-4 py-3 text-sm text-rose-700 dark:text-rose-300 ring-1 ring-rose-200 dark:ring-rose-500/30">
+      <%= error %>
+    </div>
+  <% end %>
+
+  <%= form_with url: imports_path, multipart: true, data: { controller: "file-drop" }, class: "space-y-5" do %>
+    <label for="statement"
+           data-file-drop-target="zone"
+           class="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-line px-6 py-12 text-center transition hover:border-indigo-400 hover:bg-surface-muted">
+      <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
+        <%= nav_icon(:upload, "h-6 w-6") %>
+      </span>
+      <span class="mt-4 text-sm font-semibold text-fg" data-file-drop-target="name">Clique para escolher ou arraste o arquivo aqui</span>
+      <span class="mt-1 text-xs text-fg-muted">PDF, foto (JPG, PNG, WEBP), OFX ou CSV · até 20 MB</span>
+      <%= file_field_tag :statement, accept: StatementParser::EXTENSIONS.join(","), required: true,
+            class: "sr-only", data: { file_drop_target: "input", action: "change->file-drop#show" } %>
+    </label>
+
+    <div>
+      <label for="password" class="block text-sm font-medium text-fg-soft">Senha do PDF <span class="font-normal text-fg-subtle">(só se o arquivo tiver, por exemplo os dígitos do CPF)</span></label>
+      <%= password_field_tag :password, nil, autocomplete: "off",
+            class: "mt-1.5 block w-full rounded-xl border-0 bg-surface px-3.5 py-2.5 text-sm text-fg shadow-sm ring-1 ring-line placeholder:text-fg-subtle focus:ring-2 focus:ring-indigo-500 sm:max-w-xs" %>
+    </div>
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-xs text-fg-muted">O arquivo é lido pelo próprio PlanSpent, sem enviar nada para serviços externos, e não fica salvo (nem a senha).</p>
+      <button type="submit" data-turbo-submits-with="Lendo extrato…"
+              class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-wait disabled:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas cursor-pointer">
+        Ler extrato
+      </button>
+    </div>
+  <% end %>
+
+  <details class="mt-6 rounded-xl bg-surface-muted px-4 py-3 text-sm text-fg-soft">
+    <summary class="cursor-pointer font-medium text-fg">Qual formato funciona melhor?</summary>
+    <ul class="mt-3 list-disc space-y-1.5 pl-5 text-fg-muted">
+      <li><strong class="text-fg-soft">OFX</strong> (às vezes chamado de "Money" ou "Quicken") é o mais preciso. Procure em <strong class="text-fg-soft">Extrato › Exportar</strong> no app ou internet banking. <strong class="text-fg-soft">CSV</strong> também funciona bem.</li>
+      <li><strong class="text-fg-soft">PDF</strong> baixado do banco funciona na maioria dos casos. Confira as linhas na revisão.</li>
+      <li><strong class="text-fg-soft">Fotos e PDFs escaneados</strong> dependem da qualidade da imagem: prefira foto reta, bem iluminada e sem cortes.</li>
+      <li>Faturas de cartão também funcionam: compras entram como gastos e pagamentos como créditos.</li>
+    </ul>
+  </details>
+</section>

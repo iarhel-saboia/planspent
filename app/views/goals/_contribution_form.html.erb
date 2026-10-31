@@ -1,0 +1,35 @@
+<% input = "block w-full rounded-xl border-0 py-2.5 px-3.5 text-fg shadow-sm ring-1 ring-line placeholder:text-fg-subtle focus:ring-2 focus:ring-indigo-500" %>
+
+<%= form_with scope: :contribution, url: goal_contributions_path(goal), id: contribution_form_id(goal, withdrawal), namespace: contribution_form_id(goal, withdrawal), class: "mt-5 space-y-4" do |f| %>
+  <%= f.hidden_field :kind, value: withdrawal ? "withdrawal" : "deposit" %>
+  <%= render "shared/form_errors", record: entry %>
+
+  <p class="text-sm text-fg-muted">
+    <% if withdrawal %>
+      Guardado na meta: <strong class="font-semibold text-fg-soft"><%= brl(goal.saved_amount) %></strong>. O resgate entra como crédito no mês.
+    <% else %>
+      O valor entra como gasto em <strong class="font-semibold text-fg-soft"><%= Goal::CONTRIBUTION_CATEGORY %></strong> no mês, já que é dinheiro que você separou.
+    <% end %>
+  </p>
+
+  <div>
+    <%= f.label :amount, "Valor", class: "mb-1.5 block text-sm font-medium text-fg-soft" %>
+    <div class="relative">
+      <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-fg-subtle">R$</span>
+      <%= f.text_field :amount, inputmode: "decimal", placeholder: "0,00", autocomplete: "off", autofocus: true,
+            value: entry.amount_before_type_cast, class: "#{input} pl-11 text-lg font-semibold tabular-nums" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :occurred_on, "Data", class: "mb-1.5 block text-sm font-medium text-fg-soft" %>
+    <%= f.date_field :occurred_on, value: entry.occurred_on || Date.current, class: input %>
+  </div>
+
+  <div class="flex justify-end gap-3 pt-2">
+    <button type="button" data-action="modal#close"
+            class="rounded-xl px-4 py-2.5 text-sm font-semibold text-fg-soft hover:bg-surface-muted cursor-pointer">Cancelar</button>
+    <%= f.submit withdrawal ? "Resgatar" : "Guardar",
+          class: "rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm cursor-pointer #{withdrawal ? 'bg-fg-soft hover:bg-fg' : 'bg-indigo-600 hover:bg-indigo-500'}" %>
+  </div>
+<% end %>

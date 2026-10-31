@@ -1,0 +1,77 @@
+<% goal = monthly_goal %>
+<% colors = goal.colors %>
+<% month ||= Date.current %>
+<% result = goal.month_result(month) %>
+<% current = month.beginning_of_month == Date.current.beginning_of_month %>
+<article id="<%= dom_id(goal) %>" class="flex flex-col rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex min-w-0 items-center gap-3">
+      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl <%= colors[:soft] %>">
+        <%= nav_icon(:wallet, "h-5 w-5") %>
+      </span>
+      <div class="min-w-0">
+        <h3 class="truncate text-base font-semibold text-fg">
+          <%= link_to goal.name, goal_path(goal), class: "hover:underline" %>
+        </h3>
+        <p class="text-xs text-fg-muted">Meta mensal · investir <%= monthly_goal_target(goal) %></p>
+      </div>
+    </div>
+    <% if result.hit? %>
+      <span class="inline-flex rounded-full bg-emerald-50 dark:bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">Atingida</span>
+    <% elsif current %>
+      <span class="inline-flex rounded-full bg-surface-muted px-2.5 py-0.5 text-xs font-medium text-fg-muted">Em andamento</span>
+    <% else %>
+      <span class="inline-flex rounded-full bg-rose-50 dark:bg-rose-500/15 px-2.5 py-0.5 text-xs font-medium text-rose-700 dark:text-rose-300">Não atingida</span>
+    <% end %>
+  </div>
+
+  <p class="mt-5 text-xs font-medium text-fg-muted">Investido em <%= l(month, format: "%B").downcase %></p>
+  <div class="mt-1 flex items-baseline justify-between gap-2">
+    <p class="text-2xl font-semibold tabular-nums <%= result.invested.negative? ? 'text-rose-600 dark:text-rose-400' : 'text-fg' %>"><%= brl(result.invested) %></p>
+    <p class="text-sm tabular-nums text-fg-muted">de <%= brl(result.target) %></p>
+  </div>
+  <div class="mt-2 h-2 overflow-hidden rounded-full bg-surface-muted" role="progressbar"
+       aria-valuenow="<%= result.percent %>" aria-valuemin="0" aria-valuemax="100" aria-label="Investido no mês em <%= goal.name %>">
+    <div class="h-full rounded-full <%= colors[:bar] %>" style="width: <%= result.percent %>%"></div>
+  </div>
+  <div class="mt-2 flex justify-between text-xs text-fg-muted">
+    <span><%= result.percent %>%</span>
+    <span>
+      <% if result.hit? %><%= result.surplus.positive? ? "Passou #{brl(result.surplus)}" : "Meta do mês batida" %><% else %>Faltam <%= brl(-result.surplus) %><% end %>
+    </span>
+  </div>
+
+  <div class="mt-4 flex items-end justify-between gap-3">
+    <ol class="flex items-end gap-1.5" aria-label="Últimos meses">
+      <% goal.month_history(month).each do |past| %>
+        <% past_current = past.month == Date.current.beginning_of_month %>
+        <li class="flex flex-col items-center gap-1" title="<%= month_label(past.month) %>: <%= brl(past.invested) %> de <%= brl(past.target) %>">
+          <span class="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold
+                       <%= if past.hit? then 'bg-emerald-500 text-white'
+                           elsif past_current || past.month > Date.current then 'bg-surface-muted text-fg-subtle'
+                           else 'bg-rose-500/15 text-rose-600 dark:text-rose-400' end %>">
+            <%= past.hit? ? "✓" : (past_current || past.month > Date.current ? "·" : "✕") %>
+          </span>
+          <span class="text-[10px] uppercase text-fg-subtle"><%= l(past.month, format: "%b") %></span>
+        </li>
+      <% end %>
+    </ol>
+    <% if (streak = goal.streak(month)).positive? %>
+      <p class="text-right text-xs text-fg-muted"><strong class="text-sm font-semibold text-fg"><%= streak %></strong> <%= streak == 1 ? "mês seguido" : "meses seguidos" %></p>
+    <% end %>
+  </div>
+
+  <% unless Goal.savings.exists? %>
+    <p class="mt-4 rounded-xl bg-surface-muted px-3 py-2 text-sm text-fg-soft">
+      Crie uma meta de valor (como uma reserva) e use <strong class="font-semibold text-fg">Guardar</strong> para registrar o que investe.
+    </p>
+  <% end %>
+
+  <div class="mt-auto flex justify-end pt-5">
+    <button type="button" data-controller="modal-trigger" data-action="modal-trigger#open"
+            data-modal-trigger-dialog-value="<%= goal_modal_id(goal) %>"
+            class="rounded-xl px-3 py-2 text-sm font-medium text-fg-muted hover:bg-surface-muted hover:text-fg-soft cursor-pointer">Editar</button>
+  </div>
+
+  <%= render "goals/modals", goal: goal %>
+</article>

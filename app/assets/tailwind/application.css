@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Neutral color tokens used across the app (bg-canvas, bg-surface, text-fg, border-line...).
+  Light values live here; dark values are overridden in the .dark block below.
+  To change the palette, edit only these two blocks.
+*/
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-canvas: #f8fafc;        /* page background */
+  --color-surface: #ffffff;       /* cards, sidebar, modals, inputs */
+  --color-surface-muted: #f1f5f9; /* hover states */
+  --color-line: #e2e8f0;          /* borders and rings */
+  --color-line-subtle: #f1f5f9;   /* dividers */
+  --color-fg: #0f172a;            /* headings */
+  --color-fg-soft: #334155;       /* body text */
+  --color-fg-muted: #64748b;      /* secondary text */
+  --color-fg-subtle: #94a3b8;     /* placeholders, inactive icons */
+}
+
+@layer base {
+  .dark {
+    color-scheme: dark;
+
+    --color-canvas: #1e1f22;
+    --color-surface: #27282c;
+    --color-surface-muted: #33353a;
+    --color-line: #3b3d42;
+    --color-line-subtle: #313338;
+    --color-fg: #f3f4f6;
+    --color-fg-soft: #d1d5db;
+    --color-fg-muted: #9ca3af;
+    --color-fg-subtle: #6b7280;
+  }
+}
+
+dialog::backdrop {
+  background: rgb(15 23 42 / 0.45);
+  backdrop-filter: blur(3px);
+}
+
+.dark dialog::backdrop {
+  background: rgb(0 0 0 / 0.6);
+}
+
+dialog[open] {
+  animation: modal-in 160ms ease-out;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Month chart: bars fill from the left when the dialog opens */
+@keyframes chart-grow-x {
+  from { transform: scaleX(0); }
+}
+
+.chart-grow-x {
+  transform-origin: left;
+  animation: chart-grow-x 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-grow-x { animation: none; }
+}
